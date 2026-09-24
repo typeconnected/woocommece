@@ -16,26 +16,29 @@ button{padding:9px 14px;border:0;border-radius:8px;background:#4f46e5;color:#fff
 label{font-size:12px;font-weight:700;color:#64748b}.th{width:44px;height:44px;border-radius:8px;object-fit:cover;background:#eef2ff;display:inline-block}
 .pill{padding:3px 9px;border-radius:99px;font-size:12px;font-weight:700;background:#e0e7ff;color:#3730a3}
 </style></head><body>
-<nav><b>⚙️ TypeConnected Admin</b><a data-t="dash">Dashboard</a><a data-t="orders">Orders</a><a data-t="products">Products</a><a data-t="coupons">Coupons</a><a data-t="settings">Settings</a><a href="/" style="margin-left:auto">View shop ↗</a></nav>
+<nav><b>⚙️ TypeConnected Admin</b><a data-t="dash">Dashboard</a><a data-t="orders">Orders</a><a data-t="products">Products</a><a data-t="coupons">Coupons</a><a data-t="banners">Banners</a><a data-t="pages">Pages</a><a data-t="inbox">Inbox</a><a data-t="settings">Settings</a><a href="/" style="margin-left:auto">View shop ↗</a></nav>
 <main id="m"></main>
 <script>
 const $=s=>document.querySelector(s),money=n=>'৳'+Number(n).toLocaleString('en-IN');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const j=async(u,m='GET',b)=>{const r=await fetch(u,{method:m,headers:b?{'Content-Type':'application/json'}:{},body:b&&JSON.stringify(b)});const d=await r.json();if(!r.ok)throw new Error(d.error||'Error');return d};
-const T={dash,orders,products,coupons,settings};let ORD=[],PR=[];
+const T={dash,orders,products,coupons,banners,pages,inbox,settings};let ORD=[],PR=[];
 document.querySelectorAll('nav a[data-t]').forEach(a=>a.onclick=()=>go(a.dataset.t));
 function go(t){document.querySelectorAll('nav a[data-t]').forEach(a=>a.classList.toggle('on',a.dataset.t===t));T[t]()}
 async function dash(){const s=await j('/api/admin/stats');
+  const mx=Math.max(1,...s.daily.map(d=>d.s)),chart=`<div class="box"><h3>Last 7 days sales</h3><div style="display:flex;gap:10px;align-items:flex-end;min-height:170px">${s.daily.map(d=>`<div style="flex:1;text-align:center;font-size:11px"><div style="background:#6366f1;border-radius:6px 6px 0 0;height:${Math.max(4,Math.round(d.s/mx*110))}px"></div>${d.d.slice(5)}<br><b>${money(d.s)}</b></div>`).join('')||'No sales yet'}</div></div>
+  <p><a href="/api/admin/orders.csv"><button class="s">⬇ Export orders (CSV)</button></a> <a href="/api/admin/backup"><button class="s">⬇ Backup database</button></a></p>`;
   $('#m').innerHTML=`<div class="stats"><div class="stat"><small>Revenue</small><h2>${money(s.revenue)}</h2></div><div class="stat"><small>Total orders</small><h2>${s.orders}</h2></div>
   <div class="stat"><small>Pending</small><h2>${s.pending}</h2></div><div class="stat"><small>Today</small><h2>${s.today}</h2></div></div>
-  <div class="g"><div class="box"><h3>Low stock</h3>${s.low.map(p=>`<p>${esc(p.name)} — <b>${p.stock}</b></p>`).join('')||'All good ✅'}</div>
+  ${chart}<div class="g"><div class="box"><h3>Low stock</h3>${s.low.map(p=>`<p>${esc(p.name)} — <b>${p.stock}</b></p>`).join('')||'All good ✅'}</div>
   <div class="box"><h3>Top products</h3>${s.top.map(p=>`<p>${esc(p.name)} — <b>${p.q}</b> sold</p>`).join('')||'No sales yet'}</div></div>`}
 async function orders(){ORD=await j('/api/admin/orders');
   $('#m').innerHTML=`<div class="box"><h3>Orders</h3><table><tr><th>Order</th><th>Customer</th><th>Items</th><th>Payment</th><th>Total</th><th>Status</th><th></th></tr>${ORD.map(o=>`<tr>
   <td><b>${esc(o.order_no)}</b><br><small>${esc(o.created_at)}</small></td><td>${esc(o.name)}<br>${esc(o.phone)}<br><small>${esc(o.address)}</small></td>
-  <td>${o.items.map(i=>esc(i.name)+' ×'+i.qty).join('<br>')}</td><td><span class="pill">${esc(o.payment)}</span>${o.trx?'<br><small>TrxID: '+esc(o.trx)+'</small>':''}</td>
+  <td>${o.items.map(i=>esc(i.name)+' ×'+i.qty).join('<br>')}</td><td><span class="pill">${esc(o.payment)}</span> <span class="pill" style="background:${o.pay_status==='paid'?'#dcfce7':'#fef3c7'}">${esc(o.pay_status)}</span>${o.pay_status!=='paid'?` <button class="s" onclick="paid(${o.id})">Mark paid</button>`:''}${o.trx?'<br><small>TrxID: '+esc(o.trx)+'</small>':''}</td>
   <td><b>${money(o.total)}</b></td><td><select onchange="st(${o.id},this.value)">${['pending','confirmed','shipped','delivered','cancelled'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}</select></td>
   <td><button class="s" onclick="inv(${o.id})">Invoice</button></td></tr>`).join('')}</table></div>`}
+async function paid(id){await j(`/api/admin/orders/${id}/paid`,'POST',{});orders()}
 async function st(id,s){await j(`/api/admin/orders/${id}/status`,'POST',{status:s})}
 function inv(id){const o=ORD.find(x=>x.id===id),w=open('','_blank');
   w.document.write(`<body style="font-family:sans-serif;max-width:600px;margin:30px auto"><h2>Invoice ${esc(o.order_no)}</h2><p>${esc(o.name)}<br>${esc(o.phone)}<br>${esc(o.address)}</p>
@@ -45,16 +48,16 @@ async function products(){PR=await j('/api/admin/products');
   $('#m').innerHTML=`<div class="box"><h3 id="ft">Add product</h3><input type="hidden" id="p_id"><div class="g">
   <div><label>Name</label><input id="p_name"></div><div><label>Price (৳)</label><input id="p_price" type="number"></div><div><label>Sale price (optional)</label><input id="p_sale" type="number"></div>
   <div><label>Category</label><input id="p_cat" placeholder="Gadgets"></div><div><label>Stock</label><input id="p_stock" type="number"></div>
-  <div><label>Image</label><input id="p_img" type="file" accept="image/*"></div></div>
+  <div><label>Options (e.g. S,M,L)</label><input id="p_var" placeholder="optional"></div><div><label>Image</label><input id="p_img" type="file" accept="image/*"></div></div>
   <label>Description</label><textarea id="p_desc" rows="2"></textarea><button onclick="saveP()">Save product</button> <button class="s" onclick="products()">Clear</button><span id="pe" style="color:#dc2626"></span></div>
   <div class="box"><table><tr><th></th><th>Name</th><th>Price</th><th>Stock</th><th>Category</th><th></th></tr>${PR.map(p=>`<tr>
   <td>${p.image?`<img class="th" src="${esc(p.image)}">`:'<span class="th"></span>'}</td><td>${esc(p.name)}</td><td>${money(p.price)}${p.sale_price>0?' → '+money(p.sale_price):''}</td>
   <td>${p.stock}</td><td>${esc(p.category)}</td><td><button class="s" onclick="editP(${p.id})">Edit</button> <button class="d" onclick="delP(${p.id})">Delete</button></td></tr>`).join('')}</table></div>`}
 function editP(id){const p=PR.find(x=>x.id===id);scrollTo(0,0);$('#ft').textContent='Edit product';
-  p_id.value=id;p_name.value=p.name;p_price.value=p.price;p_sale.value=p.sale_price||'';p_cat.value=p.category;p_stock.value=p.stock;p_desc.value=p.description}
+  p_id.value=id;p_name.value=p.name;p_price.value=p.price;p_sale.value=p.sale_price||'';p_cat.value=p.category;p_stock.value=p.stock;p_var.value=p.variants||'';p_desc.value=p.description}
 async function saveP(){const f=new FormData(),id=p_id.value;
   f.append('name',p_name.value);f.append('price',p_price.value);f.append('sale_price',p_sale.value||0);f.append('category',p_cat.value);
-  f.append('stock',p_stock.value||0);f.append('description',p_desc.value);if(p_img.files[0])f.append('image',p_img.files[0]);
+  f.append('stock',p_stock.value||0);f.append('variants',p_var.value);f.append('description',p_desc.value);if(p_img.files[0])f.append('image',p_img.files[0]);
   const r=await fetch('/api/admin/products'+(id?'/'+id:''),{method:id?'PUT':'POST',body:f});
   if(!r.ok){pe.textContent=' '+(await r.json()).error;return}products()}
 async function delP(id){if(confirm('Delete this product?')){await j('/api/admin/products/'+id,'DELETE');products()}}
@@ -67,10 +70,31 @@ async function coupons(){const c=await j('/api/admin/coupons');
   <td><button class="d" onclick="delC(${x.id})">Delete</button></td></tr>`).join('')}</table></div>`}
 async function addC(){try{await j('/api/admin/coupons','POST',{code:c_code.value,type:c_type.value,value:c_val.value,min_total:c_min.value});coupons()}catch(e){ce.textContent=e.message}}
 async function delC(id){await j('/api/admin/coupons/'+id,'DELETE');coupons()}
-const L={store_name:'Store name',tagline:'Tagline',phone:'Phone',email:'Email',address:'Address',ship_dhaka:'Shipping inside Dhaka (৳)',ship_outside:'Shipping outside Dhaka (৳)',free_ship_over:'Free shipping over (৳, 0 = off)',bkash:'bKash number',nagad:'Nagad number'};
+const L={store_name:'Store name',tagline:'Tagline',phone:'Phone',email:'Email',address:'Address',ship_dhaka:'Shipping inside Dhaka (৳)',ship_outside:'Shipping outside Dhaka (৳)',free_ship_over:'Free shipping over (৳, 0 = off)',bkash:'bKash number',nagad:'Nagad number',whatsapp:'WhatsApp number (e.g. 01712345678)',announcement:'Top announcement bar text'};
 async function settings(){const s=await j('/api/admin/settings');
   $('#m').innerHTML=`<div class="box"><h3>Store settings</h3><div class="g">${Object.keys(L).map(k=>`<div><label>${L[k]}</label><input id="s_${k}" value="${esc(s[k])}"></div>`).join('')}</div>
   <button onclick="saveS()">Save</button> <span id="so" style="color:#16a34a"></span></div>`}
 async function saveS(){const b={};Object.keys(L).forEach(k=>b[k]=$('#s_'+k).value);await j('/api/admin/settings','POST',b);so.textContent='Saved ✓'}
+async function banners(){const b=await j('/api/admin/banners');
+  $('#m').innerHTML=`<div class="box"><h3>Add homepage banner</h3><div class="g"><div><label>Title</label><input id="b_t"></div><div><label>Subtitle</label><input id="b_s"></div>
+  <div><label>Link (optional, e.g. #/p/3)</label><input id="b_l"></div><div><label>Button text</label><input id="b_b" value="Shop now"></div>
+  <div><label>Background image (optional)</label><input id="b_i" type="file" accept="image/*"></div></div><button onclick="addB()">Add banner</button> <span id="be" style="color:#dc2626"></span></div>
+  <div class="box"><table><tr><th>Title</th><th>Subtitle</th><th>Link</th><th></th></tr>${b.map(x=>`<tr><td>${esc(x.title)}</td><td>${esc(x.subtitle)}</td><td>${esc(x.link)}</td><td><button class="d" onclick="delB(${x.id})">Delete</button></td></tr>`).join('')}</table></div>`}
+async function addB(){const f=new FormData();f.append('title',b_t.value);f.append('subtitle',b_s.value);f.append('link',b_l.value);f.append('btn',b_b.value);if(b_i.files[0])f.append('image',b_i.files[0]);
+  const r=await fetch('/api/admin/banners',{method:'POST',body:f});if(!r.ok){be.textContent=' '+(await r.json()).error;return}banners()}
+async function delB(id){await j('/api/admin/banners/'+id,'DELETE');banners()}
+let PG=[];
+async function pages(){PG=await j('/api/admin/pages');
+  $('#m').innerHTML=`<div class="box"><h3>Add / edit page</h3><input type="hidden" id="g_slug"><label>Title</label><input id="g_t"><label>Content (blank line = new paragraph)</label>
+  <textarea id="g_b" rows="7"></textarea><button onclick="saveG()">Save page</button> <button class="s" onclick="pages()">Clear</button></div>
+  <div class="box"><table><tr><th>Page</th><th>Link</th><th></th></tr>${PG.map(x=>`<tr><td>${esc(x.title)}</td><td>#/page/${esc(x.slug)}</td><td><button class="s" onclick="editG('${esc(x.slug)}')">Edit</button> <button class="d" onclick="delG('${esc(x.slug)}')">Delete</button></td></tr>`).join('')}</table></div>`}
+function editG(s){const x=PG.find(p=>p.slug===s);scrollTo(0,0);g_slug.value=s;g_t.value=x.title;g_b.value=x.body}
+async function saveG(){await j('/api/admin/pages','POST',{slug:g_slug.value,title:g_t.value,body:g_b.value});pages()}
+async function delG(s){if(confirm('Delete this page?')){await j('/api/admin/pages/'+s,'DELETE');pages()}}
+async function inbox(){const d=await j('/api/admin/messages');
+  $('#m').innerHTML=`<div class="box"><h3>Contact messages</h3><table><tr><th>From</th><th>Message</th><th>Date</th><th></th></tr>${d.messages.map(m=>`<tr><td>${esc(m.name)}<br>${esc(m.phone)}<br>${esc(m.email)}</td><td>${esc(m.message)}</td><td>${esc(m.created_at)}</td>
+  <td><button class="d" onclick="delM(${m.id})">Delete</button></td></tr>`).join('')||'<tr><td>No messages</td></tr>'}</table></div>
+  <div class="box"><h3>Newsletter subscribers (${d.subscribers.length})</h3>${d.subscribers.map(s=>`<p>${esc(s.email)} <small>${esc(s.created_at)}</small></p>`).join('')||'None yet'}</div>`}
+async function delM(id){await j('/api/admin/messages/'+id,'DELETE');inbox()}
 go('dash');
 </script></body></html>

@@ -1,171 +1,20 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TypeConnected</title>
-<style>
-:root{--brand:#4f46e5;--dark:#0f172a;--mut:#64748b;--bg:#f8fafc;--line:#e2e8f0;--ok:#16a34a;--bad:#dc2626}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--dark)}
-a{color:inherit;text-decoration:none}.wrap{max-width:1150px;margin:0 auto;padding:0 18px}
-header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
-.nav{display:flex;align-items:center;gap:14px;height:64px}.logo{font-weight:800;font-size:22px;letter-spacing:-.5px}.logo b{color:var(--brand)}
-.search{flex:1;max-width:420px;margin-left:auto}.search input{width:100%;padding:10px 16px;border:1px solid var(--line);border-radius:99px;background:var(--bg);outline:0}
-.nav a.l{color:var(--mut);font-size:14px;font-weight:600}
-.btn{display:inline-block;border:0;border-radius:10px;padding:11px 18px;background:var(--brand);color:#fff;font-weight:700;font-size:14px;cursor:pointer}
-.btn:hover{filter:brightness(1.1)}.btn.o{background:#fff;color:var(--brand);border:1.5px solid var(--brand)}.btn.w{width:100%;text-align:center}.btn:disabled{opacity:.5;cursor:not-allowed}
-.hero{background:linear-gradient(135deg,#0f172a,#4f46e5 65%,#7c3aed);color:#fff;padding:70px 0}
-.hero h1{font-size:clamp(32px,6vw,56px);margin:0 0 10px;letter-spacing:-1.5px}.hero p{font-size:18px;opacity:.85;margin:0 0 24px}
-.hero .btn{background:#fff;color:var(--brand)}
-.trust{display:flex;gap:26px;flex-wrap:wrap;margin-top:28px;font-size:14px;opacity:.9}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 16px}.chip{padding:8px 16px;border-radius:99px;background:#fff;border:1px solid var(--line);font-size:14px;font-weight:600;cursor:pointer}
-.chip.on{background:var(--dark);color:#fff;border-color:var(--dark)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;margin-bottom:50px}
-.card{position:relative;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;transition:.2s;display:block}
-.card:hover{transform:translateY(-4px);box-shadow:0 12px 30px #0f172a1a}
-.im{aspect-ratio:1;background:#eef2ff;display:flex;align-items:center;justify-content:center;overflow:hidden}.im img{width:100%;height:100%;object-fit:cover}
-.ph{font-size:64px;font-weight:800;color:var(--brand);opacity:.35}
-.in{padding:14px}.in small{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.5px}.in h3{margin:4px 0 8px;font-size:16px}
-.pr{font-weight:800;font-size:17px}.pr s{color:var(--mut);font-weight:500;font-size:13px;margin-left:6px}
-.tag{position:absolute;top:10px;left:10px;z-index:2;background:var(--bad);color:#fff;font-size:11px;font-weight:800;padding:4px 9px;border-radius:99px}.tag.out{background:#475569;left:auto;right:10px}
-.box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px}
-.pd{display:grid;grid-template-columns:1fr 1fr;gap:34px;margin:30px 0}@media(max-width:760px){.pd,.co{grid-template-columns:1fr!important}}
-.pd .im{border-radius:16px}.pd h1{margin:6px 0 10px}.pd .pr{font-size:26px;margin:10px 0}
-.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px}.qty button{border:0;background:none;width:38px;height:38px;font-size:18px;cursor:pointer}.qty span{min-width:30px;text-align:center;font-weight:700}
-.co{display:grid;grid-template-columns:1.3fr 1fr;gap:22px;margin:30px 0}
-input,textarea,select{width:100%;padding:11px 12px;margin:5px 0 10px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff}
-label{font-size:13px;font-weight:700;color:var(--mut)}
-.row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0}.row.t{font-weight:800;font-size:18px;border-top:1px solid var(--line);padding-top:12px}
-.pay{display:flex;gap:10px;margin:6px 0 12px;flex-wrap:wrap}.pay label{flex:1;min-width:110px;border:1.5px solid var(--line);border-radius:10px;padding:10px;cursor:pointer;color:var(--dark);text-align:center}
-.pay input{display:none}.pay label.on{border-color:var(--brand);background:#eef2ff}
-#drawer{position:fixed;top:0;right:-420px;width:400px;max-width:100%;height:100%;background:#fff;z-index:50;padding:20px;overflow:auto;transition:.25s;box-shadow:-8px 0 30px #0003}
-#drawer.open{right:0}#ov{display:none;position:fixed;inset:0;background:#0006;z-index:40}#ov.on{display:block}
-.ci{display:flex;gap:12px;align-items:center;margin:12px 0}.ci .im{width:60px;height:60px;border-radius:10px;flex:none}.ci .ph{font-size:24px}
-.msg{padding:10px 14px;border-radius:10px;margin:8px 0;font-size:14px}.msg.e{background:#fee2e2;color:#991b1b}.msg.s{background:#dcfce7;color:#166534}
-.steps{display:flex;justify-content:space-between;margin:22px 0}.st{flex:1;text-align:center;font-size:12px;color:var(--mut);font-weight:700}
-.st i{display:block;width:26px;height:26px;border-radius:50%;background:var(--line);margin:0 auto 6px;line-height:26px;color:#fff;font-style:normal}.st.on{color:var(--ok)}.st.on i{background:var(--ok)}
-footer{background:var(--dark);color:#cbd5e1;padding:36px 0;margin-top:40px;font-size:14px}footer b{color:#fff}
-</style></head><body>
+<title>TypeConnected</title><meta name="description" content="TypeConnected – online shop in Bangladesh">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css"></head><body>
+<div class="ann" id="ann"></div>
 <header><div class="wrap nav">
-  <a href="#/" class="logo" id="logo">Type<b>Connected</b></a>
+  <a href="#/" class="logo" id="logo">TypeConnected</a>
+  <div class="links"><a onclick="pickCat('')">Shop</a><a href="#/contact">Contact</a><a href="#/track">Track order</a></div>
   <div class="search"><input id="q" placeholder="Search products…" oninput="doSearch(this.value)"></div>
-  <a class="l" href="#/track">Track order</a>
+  <a class="l" href="#/account" id="acc">Login</a>
   <button class="btn" onclick="openCart()">🛒 <span id="cnt">0</span></button>
 </div></header>
 <div id="app"></div>
-<footer><div class="wrap"><b id="fname"></b><p id="fcontact"></p><p>© <span id="yr"></span> TypeConnected · typeconnected.com</p></div></footer>
+<footer id="ft"></footer>
+<a class="wa" id="wa" target="_blank" rel="noopener">💬</a>
 <div id="ov" onclick="closeCart()"></div>
-<aside id="drawer"><h3 style="margin-top:0">Your Cart <button class="btn o" style="float:right;padding:4px 10px" onclick="closeCart()">✕</button></h3><div id="ci"></div></aside>
-<script>
-const $=s=>document.querySelector(s),money=n=>'৳'+Number(n).toLocaleString('en-IN');
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const eff=p=>p.sale_price>0?p.sale_price:p.price;
-let CFG={},P=[],cart={},F={q:'',cat:''},CP=null;
-try{cart=JSON.parse(localStorage.tc_cart||'{}')}catch{}
-const api=async(u,o)=>{const r=await fetch(u,o);const d=await r.json();if(!r.ok)throw new Error(d.error||'Error');return d};
-const img=p=>p.image?`<img src="${esc(p.image)}" alt="${esc(p.name)}" loading="lazy">`:`<div class="ph">${esc(p.name[0])}</div>`;
-const card=p=>`<a class="card" href="#/p/${p.id}">${p.sale_price>0?'<span class="tag">SALE</span>':''}${p.stock<1?'<span class="tag out">Sold out</span>':''}
-<div class="im">${img(p)}</div><div class="in"><small>${esc(p.category)}</small><h3>${esc(p.name)}</h3>
-<div class="pr">${money(eff(p))}${p.sale_price>0?`<s>${money(p.price)}</s>`:''}</div></div></a>`;
-
-async function init(){
-  [CFG,P]=await Promise.all([api('/api/config'),api('/api/products')]);
-  document.title=CFG.store_name+' – '+CFG.tagline;$('#yr').textContent=new Date().getFullYear();
-  $('#fname').textContent=CFG.store_name;$('#fcontact').textContent=`📞 ${CFG.phone} · ✉️ ${CFG.email} · 📍 ${CFG.address}`;
-  cleanCart();route();
-}
-addEventListener('hashchange',route);
-function route(){const h=location.hash.slice(1)||'/';scrollTo(0,0);
-  if(h.startsWith('/p/'))product(+h.slice(3));else if(h==='/checkout')checkout();else if(h==='/track')track();else home();}
-function cleanCart(){for(const id in cart){const p=P.find(x=>x.id==id);if(!p||p.stock<1)delete cart[id];else cart[id]=Math.min(cart[id],p.stock)}saveCart()}
-
-function home(){
-  $('#app').innerHTML=`<section class="hero"><div class="wrap"><h1>${esc(CFG.store_name)}</h1><p>${esc(CFG.tagline)}</p>
-  <button class="btn" onclick="document.getElementById('chips').scrollIntoView({behavior:'smooth'})">Shop now</button>
-  <div class="trust"><span>🚚 Delivery all over Bangladesh</span><span>💵 Cash on delivery</span><span>🔒 bKash / Nagad</span></div></div></section>
-  <div class="wrap"><div class="chips" id="chips"></div><div class="grid" id="grid"></div></div>`;
-  grid();
-}
-function grid(){
-  const cats=[...new Set(P.map(p=>p.category))];
-  const chips=$('#chips');if(!chips)return;
-  chips.innerHTML=['',...cats].map(c=>`<span class="chip ${F.cat===c?'on':''}" onclick="F.cat='${esc(c).replace(/'/g,'')}';grid()">${c?esc(c):'All'}</span>`).join('');
-  const q=F.q.toLowerCase(),list=P.filter(p=>(!F.cat||p.category===F.cat)&&(!q||(p.name+p.category+p.description).toLowerCase().includes(q)));
-  $('#grid').innerHTML=list.map(card).join('')||'<p>No products found.</p>';
-}
-function doSearch(v){F.q=v;if(location.hash.length>2&&location.hash!=='#/'){location.hash='/'}else grid()}
-
-function product(id){
-  const p=P.find(x=>x.id===id);if(!p){location.hash='/';return}
-  $('#app').innerHTML=`<div class="wrap"><div class="pd"><div class="im">${img(p)}</div><div>
-  <small style="color:var(--mut)">${esc(p.category)}</small><h1>${esc(p.name)}</h1>
-  <div class="pr">${money(eff(p))}${p.sale_price>0?`<s>${money(p.price)}</s>`:''}</div>
-  <p style="color:var(--mut);line-height:1.6">${esc(p.description)}</p>
-  <p>${p.stock>0?`<b style="color:var(--ok)">In stock</b> (${p.stock} available)`:'<b style="color:var(--bad)">Out of stock</b>'}</p>
-  ${p.stock>0?`<div class="qty"><button onclick="pq(-1)">−</button><span id="pq">1</span><button onclick="pq(1,${p.stock})">+</button></div>
-  <p><button class="btn" onclick="add(${p.id},+$('#pq').textContent)">Add to cart</button>
-  <button class="btn o" onclick="add(${p.id},+$('#pq').textContent,true)">Buy now</button></p>`:''}</div></div></div>`;
-}
-function pq(d,max=99){const e=$('#pq');e.textContent=Math.max(1,Math.min(max,+e.textContent+d))}
-function add(id,q=1,go){const p=P.find(x=>x.id===id);cart[id]=Math.min((cart[id]||0)+q,p.stock);saveCart();go?location.hash='/checkout':openCart()}
-function chg(id,d){const p=P.find(x=>x.id==id);cart[id]=Math.min((cart[id]||0)+d,p.stock);if(cart[id]<=0)delete cart[id];saveCart();if(location.hash==='#/checkout')checkout()}
-function saveCart(){localStorage.tc_cart=JSON.stringify(cart);$('#cnt').textContent=Object.values(cart).reduce((a,b)=>a+b,0);
-  let t=0;const h=Object.keys(cart).map(id=>{const p=P.find(x=>x.id==id);if(!p)return'';t+=eff(p)*cart[id];
-  return `<div class="ci"><div class="im">${img(p)}</div><div style="flex:1"><b>${esc(p.name)}</b><br><small>${money(eff(p))}</small></div>
-  <div class="qty"><button onclick="chg(${id},-1)">−</button><span>${cart[id]}</span><button onclick="chg(${id},1)">+</button></div></div>`}).join('');
-  $('#ci').innerHTML=(h||'<p>Your cart is empty.</p>')+(h?`<div class="row t"><span>Subtotal</span><span>${money(t)}</span></div>
-  <a class="btn w" href="#/checkout" onclick="closeCart()">Checkout</a>`:'')}
-function openCart(){$('#drawer').classList.add('open');$('#ov').classList.add('on')}
-function closeCart(){$('#drawer').classList.remove('open');$('#ov').classList.remove('on')}
-
-const ids=()=>Object.keys(cart);
-const sub=()=>ids().reduce((s,id)=>s+eff(P.find(x=>x.id==id))*cart[id],0);
-function checkout(){
-  if(!ids().length){$('#app').innerHTML='<div class="wrap"><div class="box" style="margin:40px 0">Your cart is empty. <a href="#/" style="color:var(--brand)">Continue shopping</a></div></div>';return}
-  $('#app').innerHTML=`<div class="wrap"><div class="co"><div class="box"><h2 style="margin-top:0">Delivery details</h2>
-  <label>Full name *</label><input id="f_name"><label>Mobile number *</label><input id="f_phone" placeholder="01XXXXXXXXX">
-  <label>Email (optional)</label><input id="f_email"><label>Delivery area *</label>
-  <select id="f_zone" onchange="sum()"><option value="dhaka">Inside Dhaka</option><option value="outside">Outside Dhaka</option></select>
-  <label>Full address *</label><textarea id="f_addr" rows="2"></textarea><label>Order note (optional)</label><input id="f_note">
-  <label>Payment method</label><div class="pay" id="pay"></div><div id="payinfo"></div><div id="err"></div></div>
-  <div class="box" style="align-self:start"><h2 style="margin-top:0">Order summary</h2>${ids().map(id=>{const p=P.find(x=>x.id==id);
-  return `<div class="row"><span>${esc(p.name)} × ${cart[id]}</span><span>${money(eff(p)*cart[id])}</span></div>`}).join('')}
-  <div style="display:flex;gap:8px"><input id="f_cp" placeholder="Coupon code" style="margin:6px 0"><button class="btn o" onclick="coupon()">Apply</button></div>
-  <div id="sum"></div><button class="btn w" id="pb" onclick="place()" style="margin-top:12px">Place order</button></div></div></div>`;
-  setPay('cod');sum();
-}
-let PAY='cod';
-function setPay(m){PAY=m;$('#pay').innerHTML=[['cod','💵 Cash on delivery'],['bkash','bKash'],['nagad','Nagad']].map(([k,l])=>
-  `<label class="${PAY===k?'on':''}" onclick="setPay('${k}')">${l}</label>`).join('');
-  $('#payinfo').innerHTML=m==='cod'?'':`<div class="msg s">Send <b>${money(total())}</b> to <b>${esc(CFG[m])}</b> (Send Money), then enter the Transaction ID.</div>
-  <label>Transaction ID *</label><input id="f_trx">`}
-function ship(){const s=sub();return +CFG.free_ship_over>0&&s>=+CFG.free_ship_over?0:+($('#f_zone')?.value==='outside'?CFG.ship_outside:CFG.ship_dhaka)}
-const disc=()=>CP?CP.discount:0,total=()=>sub()-disc()+ship();
-function sum(){$('#sum').innerHTML=`<div class="row"><span>Subtotal</span><span>${money(sub())}</span></div>
-  ${CP?`<div class="row"><span>Discount (${esc(CP.code)})</span><span>−${money(CP.discount)}</span></div>`:''}
-  <div class="row"><span>Shipping</span><span>${ship()?money(ship()):'Free'}</span></div><div class="row t"><span>Total</span><span>${money(total())}</span></div>`;
-  if(PAY!=='cod'&&$('#payinfo .msg'))$('#payinfo .msg').innerHTML=`Send <b>${money(total())}</b> to <b>${esc(CFG[PAY])}</b> (Send Money), then enter the Transaction ID.`}
-async function coupon(){try{CP=await api(`/api/coupon?code=${encodeURIComponent($('#f_cp').value)}&subtotal=${sub()}`);$('#err').innerHTML='<div class="msg s">Coupon applied 🎉</div>'}
-  catch(e){CP=null;$('#err').innerHTML=`<div class="msg e">${esc(e.message)}</div>`}sum()}
-async function place(){
-  const b=$('#pb');b.disabled=true;
-  try{const d=await api('/api/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-    name:$('#f_name').value,phone:$('#f_phone').value,email:$('#f_email').value,address:$('#f_addr').value,zone:$('#f_zone').value,
-    note:$('#f_note').value,payment:PAY,trx:$('#f_trx')?.value,coupon:CP?.code,items:ids().map(id=>({id:+id,qty:cart[id]}))})});
-    cart={};CP=null;saveCart();P=await api('/api/products');
-    $('#app').innerHTML=`<div class="wrap"><div class="box" style="margin:40px auto;max-width:520px;text-align:center"><div style="font-size:54px">🎉</div>
-    <h2>Thank you for your order!</h2><p>Your order number is <b style="font-size:20px">${esc(d.orderNo)}</b><br>Total: <b>${money(d.total)}</b></p>
-    <p style="color:var(--mut)">Save this number. Use it with your phone number to <a href="#/track" style="color:var(--brand)">track your order</a>.</p>
-    <a class="btn" href="#/">Continue shopping</a></div></div>`;
-  }catch(e){$('#err').innerHTML=`<div class="msg e">${esc(e.message)}</div>`;b.disabled=false}
-}
-function track(){
-  $('#app').innerHTML=`<div class="wrap"><div class="box" style="margin:40px auto;max-width:560px"><h2 style="margin-top:0">Track your order</h2>
-  <label>Order number</label><input id="t_no" placeholder="TC1001"><label>Phone number</label><input id="t_ph" placeholder="01XXXXXXXXX">
-  <button class="btn w" onclick="doTrack()">Track</button><div id="tr"></div></div></div>`}
-async function doTrack(){
-  try{const o=await api(`/api/track?order_no=${encodeURIComponent($('#t_no').value)}&phone=${encodeURIComponent($('#t_ph').value)}`);
-    const S=['pending','confirmed','shipped','delivered'],i=S.indexOf(o.status);
-    $('#tr').innerHTML=(o.status==='cancelled'?'<div class="msg e">This order was cancelled.</div>':`<div class="steps">${S.map((s,k)=>`<div class="st ${k<=i?'on':''}"><i>${k<=i?'✓':k+1}</i>${s[0].toUpperCase()+s.slice(1)}</div>`).join('')}</div>`)+
-    `<p>${o.items.map(x=>esc(x.name)+' × '+x.qty).join('<br>')}</p><div class="row t"><span>Total</span><span>${money(o.total)}</span></div>`;
-  }catch(e){$('#tr').innerHTML=`<div class="msg e">${esc(e.message)}</div>`}
-}
-init();
-</script></body></html>
+<aside id="drawer"><h3 style="margin-top:0">Your Cart <button class="btn o" style="float:right;padding:4px 12px" onclick="closeCart()">✕</button></h3><div id="ci"></div></aside>
+<script src="/app.js"></script></body></html>
