@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:900px;margin:20px auto;padding:0 16px;background:#f5f5f7}
+section{background:#fff;padding:16px;border-radius:12px;margin-bottom:20px}
+input{padding:8px;margin:4px;border:1px solid #ccc;border-radius:6px}
+button{padding:8px 12px;border:0;border-radius:6px;background:#6c47ff;color:#fff;cursor:pointer}
+table{width:100%;border-collapse:collapse}td,th{padding:8px;border-bottom:1px solid #eee;text-align:left}
+</style></head><body>
+<h2>Admin Panel <a href="/" style="font-size:14px">← Shop</a></h2>
+<section><h3>Add Product</h3>
+<input id="n" placeholder="Name"><input id="p" type="number" placeholder="Price">
+<input id="i" placeholder="Emoji/Image"><input id="d" placeholder="Description">
+<button onclick="addP()">Add</button></section>
+<section><h3>Products</h3><table id="prods"></table></section>
+<section><h3>Orders</h3><table id="orders"></table></section>
+<script>
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const j=(u,m='GET',b)=>fetch(u,{method:m,headers:{'Content-Type':'application/json'},body:b&&JSON.stringify(b)}).then(r=>r.json());
+async function load(){
+  const ps=await j('/api/products');
+  prods.innerHTML=ps.map(p=>`<tr><td>${esc(p.image)} ${esc(p.name)}</td><td>৳${p.price}</td>
+   <td><button onclick="delP(${p.id})">Delete</button></td></tr>`).join('');
+  const os=await j('/api/admin/orders');
+  orders.innerHTML='<tr><th>#</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th></tr>'+
+   os.map(o=>`<tr><td>${o.id}</td><td>${esc(o.name)}<br>${esc(o.phone)}<br>${esc(o.address)}</td>
+   <td>${o.items.map(i=>esc(i.name)+' ×'+i.qty).join('<br>')}</td><td>৳${o.total}</td>
+   <td><select onchange="st(${o.id},this.value)">${['pending','shipped','delivered','cancelled']
+   .map(s=>`<option ${s==o.status?'selected':''}>${s}</option>`).join('')}</select></td></tr>`).join('');
+}
+async function addP(){await j('/api/admin/products','POST',{name:n.value,price:+p.value,image:i.value,description:d.value});load()}
+async function delP(id){if(confirm('Delete?')){await j('/api/admin/products/'+id,'DELETE');load()}}
+async function st(id,s){await j(`/api/admin/orders/${id}/status`,'POST',{status:s})}
+load();
+</script></body></html>
